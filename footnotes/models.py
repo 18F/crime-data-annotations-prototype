@@ -1,17 +1,63 @@
 from django.db import models
 
-from .agency_oris import AGENCIES
+from footnotes.agency_oris import AGENCIES
 
 class Offense(models.Model):
     code = models.TextField(max_length=10)
 
 class USState(models.Model):
     US_STATES = (
+        ('AL', 'Alabama'),
         ('AK', 'Alaska'),
+        ('AZ', 'Arizona'),
+        ('AR', 'Arkansas'),
         ('CA', 'California'),
+        ('CO', 'Colorado'),
+        ('CT', 'Connecticut'),
+        ('DC', 'Washington, DC'),
+        ('DE', 'Delaware'),
+        ('FL', 'Florida'),
+        ('GA', 'Georgia'),
+        ('HI', 'Hawaii'),
         ('ID', 'Idaho'),
+        ('IL', 'Illinois'),
+        ('IN', 'Indiana'),
+        ('IA', 'Iowa'),
+        ('KS', 'Kansas'),
+        ('KY', 'Kentucky'),
+        ('LA', 'Louisiana'),
+        ('MA', 'Massachusetts'),
+        ('MD', 'Maryland'),
+        ('ME', 'Maine'),
+        ('MI', 'Michigan'),
+        ('MO', 'Missouri'),
+        ('MN', 'Minnesota'),
+        ('MS', 'Mississippi'),
+        ('MT', 'Montana'),
+        ('NC', 'North Carolina'),
+        ('ND', 'North Dakota'),
+        ('NB', 'Nebraska'),
+        ('NV', 'Nevada'),
+        ('NH', 'New Hampshire'),
+        ('NJ', 'New Jersey'),
+        ('NM', 'New Mexico'),
         ('NY', 'New York'),
-        ('WV', 'West Virginia')
+        ('OH', 'Ohio'),
+        ('OK', 'Oklahoma'),
+        ('OR', 'Oregon'),
+        ('PA', 'Pennsylvania'),
+        ('RI', 'Rhode Island'),
+        ('SC', 'South Carolina'),
+        ('SD', 'South Dakota'),
+        ('TN', 'Tennessee'),
+        ('TX', 'Texas'),
+        ('UT', 'Utah'),
+        ('VT', 'Vermont'),
+        ('VA', 'Virginia'),
+        ('WA', 'Washington'),
+        ('WI', 'Wisconsin'),
+        ('WV', 'West Virginia'),
+        ('WY', 'Wyoming'),
     )
     name = models.TextField(choices=US_STATES, unique=True)
 
@@ -27,7 +73,7 @@ class Year(models.Model):
 
 
 class Agency(models.Model):
-    ORIS = [(a['ori'], a['ori']) for a in AGENCIES]
+    ORIS = [(ori, ori) for ori in AGENCIES.keys()]
     TYPES = [
         ('city', 'city'),
         ('county', 'county'),
@@ -55,7 +101,14 @@ class Annotation(models.Model):
     agency_ori = models.ForeignKey(Agency, blank=True, null=True, on_delete=models.CASCADE)
     data_type = models.TextField(choices=DATA_TYPES)
     offense = models.ForeignKey(Offense, blank=True, null=True, on_delete=models.CASCADE)
-    annontation_type = models.TextField(choices=ANNOTATION_TYPES)
+    annotation_type = models.TextField(choices=ANNOTATION_TYPES)
     annotation_text = models.TextField(blank=True, null=True)
     us_state = models.ForeignKey(USState, blank=True, null=True, on_delete=models.CASCADE)
     years = models.ManyToManyField(Year, blank=True)
+
+    def __str__(self):
+        if self.agency_ori and self.us_state:
+            loc = '%s and %s' % (self.agency_ori, self.us_state)
+        else:
+            loc = '%s' % self.agency_ori or self.us_state
+        return '%s annotation for %s' % (self.annotation_type.title(), loc)
