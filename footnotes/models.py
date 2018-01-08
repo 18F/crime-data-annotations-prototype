@@ -109,6 +109,8 @@ class Annotation(models.Model):
     def __str__(self):
         if self.agency_ori and self.us_state:
             loc = '%s and %s' % (self.agency_ori, self.us_state)
-        else:
-            loc = '%s' % self.agency_ori or self.us_state
+        elif self.agency_ori and not self.us_state:
+            loc = '%s' % self.agency_ori
+        elif not self.agency_ori and self.us_state:
+            loc = '%s' % self.us_state
         return '%s annotation for %s' % (self.annotation_type.title(), loc)
